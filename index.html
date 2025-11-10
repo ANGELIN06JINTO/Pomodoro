@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AuraNote - My Tasks</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ========================
+           AuraNote Pastel Moving Fusion Styles
+           ======================== */
+        :root{
+            --dark-teal-accent:#008080;
+            --pastel-purple:#CBAACB;
+            --light-blue:#A2D2FF;
+            --teal-color:#40E0D0;
+            --pastel-green:#BDECB4;
+            --light-pink:#FFC7F0;
+            --grape-color:#A37EBE;
+            --dark-color:#343a40;
+            --success-color:#28a745;
+            --danger-color:#dc3545;
+        }
+        button {
+    background-color: #e5ccff; /* pastel violet shade */
+    color: #5a189a; /* deep violet text */
+    border: none;
+    padding: 16px 38px;
+    font-size: 1.3em;
+    border-radius: 50px; /* smooth, curvy edges */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(160, 99, 245, 0.25); /* soft violet glow */
+    font-family: 'Caveat', cursive; /* optional aesthetic font */
+}
+button:hover {
+            background-color: #ccefff;
+            transform: scale(1.05);
+        }
+        button:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(160, 99, 245, 0.3);
+}
+        @keyframes MovingFusion {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        html,body { height:100%; }
+        body{
+            margin:0;
+            min-height:100vh;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(45deg, var(--pastel-green), var(--light-pink));
+            background-size:400% 400%;
+            animation: MovingFusion 20s ease infinite;
+        }
+
+        /* Navbar */
+        .navbar{
+            background: linear-gradient(90deg, var(--pastel-purple), var(--light-blue), var(--teal-color), var(--pastel-green), var(--light-pink));
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+        .navbar-brand{
+            font-family: 'Pacifico', cursive;
+            font-size:1.8rem;
+            color: var(--grape-color);
+            text-shadow: 0 0 5px rgba(163,126,190,0.7);
+            transition: all .25s;
+        }
+        .navbar-brand:hover { opacity: 0.92; text-shadow:0 0 8px rgba(163,126,190,1); }
+
+        .btn-logout{
+            background-color: transparent;
+            color: var(--grape-color);
+            border: 2px solid var(--grape-color);
+            border-radius: 30px;
+            padding: .45rem 1.2rem;
+            font-family: 'Caveat', cursive;
+            font-size: 1.15rem;
+            font-weight:700;
+        }
+        .btn-logout:hover{ background: var(--grape-color); color:#fff; }
+
+        /* Main container */
+        .main-container{ max-width:1000px; margin:0 auto; padding: 3.5rem 1rem; }
+
+        .card{
+            border-radius: 15px;
+            border:none;
+            overflow:hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .card-header{
+            background: linear-gradient(to right, var(--pastel-purple), var(--light-blue), var(--teal-color), var(--pastel-green), var(--light-pink));
+            color:#fff; border-bottom:none; padding:1.2rem 1.5rem;
+        }
+        .header-title-style{ font-family:'Pacifico',cursive; font-size:1.6rem; font-weight:700; }
+
+        /* Form */
+        .task-form{
+            background-color: #fff;
+            border-radius: 60px;
+            padding: .5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+        }
+        .task-input{
+            border:none; padding:.75rem 1.2rem; border-radius:60px; flex:1;
+            font-size:1rem;
+        }
+        .task-input:focus{ outline:none; box-shadow:none; }
+        .task-input::placeholder{ color: var(--pastel-purple); font-family:'Caveat',cursive; font-size:1rem; font-weight:700; font-style:italic; }
+
+        .note-input::placeholder{ font-family:'Caveat',cursive; color:var(--pastel-purple); font-size:.95rem; }
+
+        .btn-add{
+            background: linear-gradient(to right, var(--pastel-purple), var(--light-blue), var(--teal-color), var(--pastel-green), var(--light-pink));
+            border:none; border-radius:50px; padding:.6rem 1.2rem; color:#fff; font-weight:600;
+        }
+
+        /* small selects & date */
+        .small-select, .small-date{
+            border-radius: 40px;
+            border: 2px solid var(--pastel-purple);
+            padding: .35rem .8rem;
+            font-family:'Caveat',cursive;
+            font-weight:700;
+            color: var(--grape-color);
+            background: #fff;
+        }
+
+        /* Task list */
+        .task-list{ margin-top:1.4rem; }
+        .task-item{
+            background:#fff; border-radius:12px; padding:1rem 1.2rem; margin-bottom:1rem;
+            display:flex; align-items:flex-start; justify-content:space-between;
+            box-shadow:0 3px 10px rgba(0,0,0,0.04);
+            border-left:5px solid var(--dark-teal-accent);
+            transition: transform .18s, box-shadow .18s;
+        }
+        .task-item:hover{ transform: translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+
+        .task-completed{ border-left:5px solid var(--success-color); opacity:.78; }
+        .task-completed .task-text, .task-completed .task-description { text-decoration: line-through; color:#999 !important; }
+
+        .task-item-content{ display:flex; align-items:flex-start; gap:.75rem; flex:1; }
+        .task-text{ font-size:1.05rem; font-weight:600; color:var(--dark-color); }
+        .task-description{ font-size:.92rem; color:#6c757d; }
+
+        .toggle-btn{ font-size:1.4rem; color:#cfcfcf; cursor:pointer; margin-right: .6rem; text-decoration:none; }
+        .toggle-btn:hover{ color: var(--dark-teal-accent); }
+        .task-completed .toggle-btn{ color: var(--success-color); }
+
+        .task-actions .btn{ border-radius:50px; padding:.45rem .9rem; margin-left:.45rem; }
+        .btn-delete{ background: #fff0f0; color: var(--danger-color); border:none; }
+        .btn-delete:hover{ background: var(--danger-color); color:#fff; }
+
+        /* small badges and metadata */
+        .priority-badge{ border-radius:8px; padding: .25rem .5rem; font-weight:700; font-size:.82rem; text-transform:capitalize; }
+        .priority-high{ background:#ffd6d6; color:#b30000; }
+        .priority-medium{ background:#fff8cc; color:#b38f00; }
+        .priority-low{ background:#dfffe6; color:#006633; }
+
+        .due-date { font-size:.82rem; color:#6c757d; }
+
+        /* Filter + progress */
+        .filter-area{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+        .filter-btn{ font-family:'Caveat',cursive; font-weight:700; border-radius:20px; padding:.35rem .7rem; }
+        .progress { height:10px; border-radius:10px; overflow:hidden; background:#f1f1f1; }
+        .progress-bar-custom{ height:10px; width:0%; background: linear-gradient(90deg, var(--teal-color), var(--pastel-purple)); transition: width .4s; }
+
+        .empty-state { text-align:center; padding:3rem 0; color:#6c757d; }
+        .empty-icon { font-size:3.2rem; color:#e9ecef; margin-bottom: .6rem; }
+
+        /* Pomodoro styles */
+        .pomodoro-container span { font-family:'Pacifico', cursive; }
+
+        @media (max-width:576px){
+            .task-item{ flex-direction:column; align-items:stretch; gap:.6rem; }
+            .task-actions{ display:flex; justify-content:flex-end; }
+            .task-form .d-flex { flex-direction:column; gap:.6rem; }
+            .small-select, .small-date { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark py-3">
+    <div class="container">
+        <a class="navbar-brand" href="#"><span class="me-2">🌟</span>AuraNote</a>
+        <div class="d-flex">
+            <a class="btn btn-logout" th:href="@{/login}" class="login-link">Sign Out🐥</a>
+    </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container main-container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h2><i class="fas fa-clipboard-list me-2"></i><span class="header-title-style">My To-Dos</span></h2>
+
+            <!-- Pomodoro Timer -->
+            <div class="pomodoro-container mt-3">
+                <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                    <span id="pomodoro-timer" class="fs-4">25:00</span>
+                    <button onclick="goToPomodoro()">🍅 Pomodoro Timer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Add Task Form -->
+            <form th:action="@{/todos/add}" th:object="${newTodo}" method="post" class="task-form d-flex flex-column">
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <input type="text" th:field="*{task}" class="task-input form-control" placeholder="What's on your mind for today'-'?" required>
+
+                    <!-- Priority -->
+                    <select th:field="*{priority}" class="small-select form-select">
+                        <option th:value="'LOW'">🩵 Low</option>
+                        <option th:value="'MEDIUM'">💛 Medium</option>
+                        <option th:value="'HIGH'">❤️ High</option>
+                    </select>
+
+                    <!-- Category -->
+                    <select th:field="*{category}" class="small-select form-select">
+                        <option th:value="'WORK'">Work</option>
+                        <option th:value="'STUDY'">Study</option>
+                        <option th:value="'PERSONAL'">Personal</option>
+                        <option th:value="'MISC'">Misc</option>
+                    </select>
+
+                    <!-- Due Date -->
+                    <input type="date" th:field="*{dueDate}" class="small-date form-control">
+
+                    <button type="submit" class="btn btn-add ms-1">+ Pop🌸</button>
+                </div>
+
+                <input type="text" th:field="*{description}" class="task-input form-control note-input mt-2" placeholder="whisper a little note here (if you like)">
+            </form>
+
+            <!-- Filter + Progress -->
+            <div class="d-flex justify-content-between align-items-center my-3 gap-3 flex-wrap">
+                <div class="filter-area">
+                    <button class="btn btn-outline-dark btn-sm filter-btn" type="button" onclick="filterTasks('all')">All</button>
+                    <button class="btn btn-outline-success btn-sm filter-btn" type="button" onclick="filterTasks('completed')">Completed</button>
+                    <button class="btn btn-outline-warning btn-sm filter-btn" type="button" onclick="filterTasks('pending')">Pending</button>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 flex-grow-1">
+                    <div class="progress flex-grow-1" style="height:10px;">
+                        <div id="progress-bar" class="progress-bar-custom" role="progressbar" style="width:0%"></div>
+                    </div>
+                    <div class="text-muted small" id="progress-text">0%</div>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="mb-3">
+                <input id="searchBox" class="form-control" type="search" placeholder="Search tasks, categories, priorities..." oninput="applySearchFilter()">
+            </div>
+
+            <!-- Task List -->
+            <div class="task-list" id="taskListContainer">
+                <div th:if="${#lists.isEmpty(todos)}" class="empty-state">
+                    <i class="fas fa-clipboard empty-icon d-block"></i>
+                    <p>You don't have any tasks yet. Add your first task above!</p>
+                </div>
+
+                <!-- Task Item Loop -->
+                <div th:each="todo : ${todos}" 
+                     th:id="'task-item-' + ${todo.id}"
+                     class="task-item d-flex justify-content-between align-items-start"
+                     th:classappend="${todo.completed} ? ' task-completed' : ''">
+
+                    <div class="task-item-content">
+                        <a href="#" th:onclick="'toggleTaskCompletion(' + ${todo.id} + ', event)'" class="toggle-btn" title="Toggle completion">
+                            <i th:classappend="${todo.completed} ? 'fa-solid fa-square-check' : 'fa-regular fa-square'" th:id="'toggle-icon-' + ${todo.id}"></i>
+                        </a>
+
+                        <div>
+                            <div class="task-text" th:text="${todo.task}">Sample Task</div>
+
+                            <div class="d-flex flex-wrap gap-2 align-items-center mt-1">
+                                <!-- Priority Badge -->
+                                <span class="priority-badge"
+                                      th:text="${todo.priority}"
+                                      th:classappend="' priority-' + ${todo.priority?.toLowerCase()}"></span>
+
+                                <!-- Category -->
+                                <span class="badge bg-light text-dark" th:text="${todo.category}">Study</span>
+
+                                <!-- Due Date -->
+                                <span class="due-date" th:if="${todo.dueDate != null}"
+                                      th:text="'Due: ' + ${#temporals.format(todo.dueDate, 'dd MMM yyyy')}">Due: 07 Oct 2025</span>
+
+                                <!-- Countdown (calculated client-side) -->
+                                <span class="due-countdown small text-muted" th:if="${todo.dueDate != null}" th:attr="data-duedate=${#temporals.format(todo.dueDate,'yyyy-MM-dd')}"></span>
+                            </div>
+
+                            <div th:if="${todo.description != null and !todo.description.isEmpty()}" class="task-description text-muted mt-2" th:text="${todo.description}">Description</div>
+                        </div>
+                    </div>
+
+                    <div class="task-actions d-flex align-items-start">
+                        <a class="btn btn-delete" th:href="@{'/todos/delete/' + ${todo.id}}" title="Delete task">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <!-- end each -->
+            </div>
+
+            <!-- Motivational Quote -->
+            <div class="text-center mt-3">
+                <em id="daily-quote" class="text-muted">You’re doing amazing — keep going 🌸</em>
+            </div>
+
+        </div> <!-- card-body -->
+    </div> <!-- card -->
+</div> <!-- main-container -->
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+function goToPomodoro() {
+            window.location.href = "pomodoro.html"; // Redirect to pomodoro.html
+        }
+
+/* ================================
+   Task Addition & Management
+   ================================ */
+const taskForm = document.querySelector('.task-form');
+const taskListContainer = document.getElementById('taskListContainer');
+
+taskForm.addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent page reload
+
+    const taskInput = taskForm.querySelector('input[th\\:field="*{task}"]');
+    const descriptionInput = taskForm.querySelector('input[th\\:field="*{description}"]');
+    const prioritySelect = taskForm.querySelector('select[th\\:field="*{priority}"]');
+    const categorySelect = taskForm.querySelector('select[th\\:field="*{category}"]');
+    const dueDateInput = taskForm.querySelector('input[th\\:field="*{dueDate}"]');
+
+    const taskText = taskInput.value.trim();
+    if (!taskText) return;
+
+    // Generate unique ID
+    const taskId = Date.now();
+
+    // Create new task element
+    const taskItem = document.createElement('div');
+    taskItem.className = 'task-item d-flex justify-content-between align-items-start';
+    taskItem.id = 'task-item-' + taskId;
+    taskItem.innerHTML = `
+        <div class="task-item-content">
+            <a href="#" class="toggle-btn" title="Toggle completion" onclick="toggleTaskCompletion(${taskId}, event)">
+                <i class="fa-regular fa-square" id="toggle-icon-${taskId}"></i>
+            </a>
+            <div>
+                <div class="task-text">${taskText}</div>
+                <div class="d-flex flex-wrap gap-2 align-items-center mt-1">
+                    <span class="priority-badge priority-${prioritySelect.value.toLowerCase()}">${prioritySelect.value}</span>
+                    <span class="badge bg-light text-dark">${categorySelect.value}</span>
+                    ${dueDateInput.value ? `<span class="due-date">Due: ${new Date(dueDateInput.value).toLocaleDateString()}</span>` : ''}
+                </div>
+                ${descriptionInput.value ? `<div class="task-description text-muted mt-2">${descriptionInput.value}</div>` : ''}
+            </div>
+        </div>
+        <div class="task-actions d-flex align-items-start">
+            <a class="btn btn-delete" href="#" onclick="deleteTask(${taskId})" title="Delete task">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </div>
+    `;
+
+    taskListContainer.appendChild(taskItem);
+
+    // Reset form
+    taskInput.value = '';
+    descriptionInput.value = '';
+    prioritySelect.value = 'LOW';
+    categorySelect.value = 'WORK';
+    dueDateInput.value = '';
+
+    updateProgressBar();
+});
+
+function toggleTaskCompletion(taskId, event) {
+    event.preventDefault();
+    const item = document.getElementById('task-item-' + taskId);
+    if (item.classList.contains('task-completed')) {
+        item.classList.remove('task-completed');
+        const icon = document.getElementById('toggle-icon-' + taskId);
+        if (icon) icon.className = 'fa-regular fa-square';
+    } else {
+        item.classList.add('task-completed');
+        const icon = document.getElementById('toggle-icon-' + taskId);
+        if (icon) icon.className = 'fa-solid fa-square-check';
+    }
+    updateProgressBar();
+}
+
+function deleteTask(taskId) {
+    const item = document.getElementById('task-item-' + taskId);
+    if (item) item.remove();
+    updateProgressBar();
+}
+
+/* Filter */
+function filterTasks(type) {
+    const tasks = document.querySelectorAll('.task-item');
+    tasks.forEach(task => {
+        task.style.display = 'flex';
+        if(type === 'completed' && !task.classList.contains('task-completed')) task.style.display = 'none';
+        if(type === 'pending' && task.classList.contains('task-completed')) task.style.display = 'none';
+    });
+}
+
+/* Search */
+function applySearchFilter() {
+    const query = document.getElementById('searchBox').value.toLowerCase();
+    const tasks = document.querySelectorAll('.task-item');
+    tasks.forEach(task => {
+        const text = task.querySelector('.task-text').textContent.toLowerCase();
+        const priority = task.querySelector('.priority-badge').textContent.toLowerCase();
+        const category = task.querySelector('.badge').textContent.toLowerCase();
+        task.style.display = (text.includes(query) || priority.includes(query) || category.includes(query)) ? 'flex' : 'none';
+    });
+}
+</script>

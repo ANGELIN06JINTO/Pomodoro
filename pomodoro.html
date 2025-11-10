@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat&display=swap');
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(270deg, 
+                #ffb3ba, #ffdfba, #ffffba, #ffb3f3, #ffd6a5);
+            background-size: 1400% 1400%;
+            animation: flowingWater 20s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        @keyframes flowingWater {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.2em;
+            margin-bottom: 25px;
+            color: #fff8e7;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+        }
+
+        #timer {
+            font-size: 5em;
+            margin-bottom: 35px;
+            padding: 25px 60px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 6px 25px rgba(255, 182, 193, 0.3);
+        }
+
+        button {
+            background-color: #ffd6e0;
+            color: #d63384;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(255, 182, 193, 0.4);
+            font-family: 'Caveat', cursive;
+            margin: 8px;
+        }
+
+        button:hover {
+            background-color: #fff0f5;
+            transform: scale(1.08);
+            box-shadow: 0 8px 22px rgba(255, 192, 203, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(255, 192, 203, 0.4);
+        }
+
+        #focus-warning {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            color: #fff;
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        #focus-status {
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #fff8e7;
+            font-family: 'Caveat', cursive;
+        }
+
+        #alarm-controls {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌈 Pomodoro Focus Timer 🌈</h1>
+    <div id="timer">25:00</div>
+    <div>
+        <button onclick="startTimer()">Start Timer</button>
+        <button onclick="toggleFocusMode()">Focus Mode: OFF</button>
+    </div>
+    <div id="focus-status"></div>
+    <div id="alarm-controls">
+        <button onclick="stopAlarm()">🛑 Stop Alarm</button>
+    
+
+    <!-- gentle alarm sound -->
+    <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
+
+    <script>
+        let timer;
+        let totalTime = 25 * 60;
+        let isRunning = false;
+        let isVisible = true;
+        let focusMode = false;
+        const focusButton = document.querySelectorAll("button")[1];
+        const alarm = document.getElementById("alarmSound");
+        const alarmControls = document.getElementById("alarm-controls");
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timer = setInterval(countdown, 1000);
+        }
+
+        function countdown() {
+            if (!isVisible) return;
+
+            let minutes = Math.floor(totalTime / 60);
+            let seconds = totalTime % 60;
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            document.getElementById("timer").textContent = `${minutes}:${seconds}`;
+            totalTime--;
+
+            if (totalTime < 0) {
+                clearInterval(timer);
+                triggerAlarm();
+            }
+        }
+
+        function triggerAlarm() {
+            document.getElementById("timer").textContent = "00:00";
+            alarm.play();
+            alarmControls.style.display = "block";
+            alert("🎉 Time’s up! Great job! Take a break 💫");
+        }
+
+        function stopAlarm() {
+            alarm.pause();
+            alarm.currentTime = 0;
+            alarmControls.style.display = "none";
+            alert("⏸ Alarm stopped! Relax a bit or start another session 🌿");
+        }
+
+        function toggleFocusMode() {
+            focusMode = !focusMode;
+            focusButton.textContent = `Focus Mode: ${focusMode ? "ON" : "OFF"}`;
+            focusButton.style.backgroundColor = focusMode ? "#ff9eb5" : "#ffd6e0";
+            document.getElementById("focus-status").textContent = focusMode 
+                ? "🧘 Focus mode activated — stay in this tab!"
+                : "💤 Focus mode turned off. You can switch freely now.";
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (focusMode && document.hidden && isRunning) {
+                isVisible = false;
+                document.getElementById("focus-warning").style.display = "flex";
+            } else {
+                isVisible = true;
+                document.getElementById("focus-warning").style.display = "none";
+            }
+        });
+
+        window.addEventListener("beforeunload", (e) => {
+            if (focusMode && isRunning && totalTime > 0) {
+                e.preventDefault();
+                e.returnValue = "You are in focus mode! Are you sure you want to leave?";
+                return e.returnValue;
+            }
+        });
+    </script>
+</body>
+</html>
