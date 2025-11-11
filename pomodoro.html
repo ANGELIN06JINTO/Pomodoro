@@ -10,28 +10,25 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    margin: 0;
-    height: 100vh;
+    background: linear-gradient(270deg, 
+        #ffb3ba, #ffdfba, #ffffba, #ffb3f3, #ffd6a5);
+    background-size: 1400% 1400%;
+    animation: flowingWater 20s ease infinite;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    margin: 0;
     color: #fff;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
     overflow: hidden;
-    position: relative;
 }
 
-/* 🎥 Background Video */
-#bg-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: contain; /* ensures the whole video is visible */
-    background-color: rgb(7, 5, 19); /* fills the empty space with black bars if needed */
-    z-index: -2;
+@keyframes flowingWater {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
 }
 
 /* ✨ Sparkle Animation */
@@ -141,20 +138,26 @@ button:active {
 }
 
 /* Responsive Fixes */
+@media (max-height: 700px) {
+    body {
+        height: auto;
+        padding: 20px;
+    }
+}
 @media (max-width: 600px) {
     h1 { font-size: 2em; }
     #timer { font-size: 3em; padding: 15px 25px; }
     button { font-size: 1em; padding: 10px 20px; }
 }
+@media (max-width: 400px) {
+    #timer { font-size: 2.5em; }
+    button { font-size: 0.9em; padding: 8px 16px; max-width: 150px; }
+    h1 { font-size: 1.8em; }
+}
 </style>
 </head>
 
 <body>
-<!-- 🎥 Background Video -->
-<video autoplay muted loop id="bg-video">
-    <source src="C:/Users/Dell/Downloads/Untitled video - Made with Clipchamp (1).mp4" type="video/mp4">
-</video>
-
 <h1>🌈 Pomodoro Focus Timer 🌈</h1>
 <div id="timer">25:00</div>
 
@@ -279,11 +282,12 @@ window.addEventListener("beforeunload", (e) => {
 
 updateDisplay();
 
+    
 /* ✨ Create Sparkles */
 function createSparkle() {
     const sparkle = document.createElement("div");
     sparkle.classList.add("sparkle");
-    sparkle.textContent = "🌼";
+    sparkle.textContent = "🌸";
     sparkle.style.left = Math.random() * 100 + "vw";
     sparkle.style.fontSize = Math.random() * 20 + 10 + "px";
     sparkle.style.animationDuration = Math.random() * 5 + 4 + "s";
@@ -294,3 +298,4 @@ setInterval(createSparkle, 250);
 </script>
 </body>
 </html>
+
