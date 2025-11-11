@@ -49,6 +49,12 @@
             box-shadow: 0 6px 25px rgba(255, 182, 193, 0.3);
         }
 
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         button {
             background-color: #ffd6e0;
             color: #d63384;
@@ -103,19 +109,33 @@
             margin-top: 20px;
             text-align: center;
         }
+
+        .mode-btn.active {
+            background-color: #ffb3c6;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
     <h1>🌈 Pomodoro Focus Timer 🌈</h1>
     <div id="timer">25:00</div>
-    <div>
+
+    <div class="controls">
+        <button class="mode-btn active" onclick="setMode('pomodoro')">Pomodoro</button>
+        <button class="mode-btn" onclick="setMode('short')">Short Break</button>
+        <button class="mode-btn" onclick="setMode('long')">Long Break</button>
+    </div>
+
+    <div class="controls">
         <button onclick="startTimer()">Start Timer</button>
         <button onclick="toggleFocusMode()">Focus Mode: OFF</button>
     </div>
+
     <div id="focus-status"></div>
+
     <div id="alarm-controls">
         <button onclick="stopAlarm()">🛑 Stop Alarm</button>
-    
+    </div>
 
     <!-- gentle alarm sound -->
     <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
@@ -126,9 +146,35 @@
         let isRunning = false;
         let isVisible = true;
         let focusMode = false;
-        const focusButton = document.querySelectorAll("button")[1];
+        let currentMode = "pomodoro"; // modes: pomodoro, short, long
+
+        const focusButton = document.querySelectorAll("button")[4];
         const alarm = document.getElementById("alarmSound");
         const alarmControls = document.getElementById("alarm-controls");
+        const timerDisplay = document.getElementById("timer");
+
+        const modes = {
+            pomodoro: 25 * 60,
+            short: 5 * 60,
+            long: 15 * 60
+        };
+
+        function setMode(mode) {
+            clearInterval(timer);
+            isRunning = false;
+            currentMode = mode;
+            totalTime = modes[mode];
+            updateDisplay();
+            highlightActiveButton(mode);
+            stopAlarm();
+        }
+
+        function highlightActiveButton(mode) {
+            document.querySelectorAll(".mode-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+            document.querySelector(`[onclick="setMode('${mode}')"]`).classList.add("active");
+        }
 
         function startTimer() {
             if (isRunning) return;
@@ -145,7 +191,7 @@
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            document.getElementById("timer").textContent = `${minutes}:${seconds}`;
+            timerDisplay.textContent = `${minutes}:${seconds}`;
             totalTime--;
 
             if (totalTime < 0) {
@@ -155,17 +201,30 @@
         }
 
         function triggerAlarm() {
-            document.getElementById("timer").textContent = "00:00";
+            timerDisplay.textContent = "00:00";
             alarm.play();
             alarmControls.style.display = "block";
-            alert("🎉 Time’s up! Great job! Take a break 💫");
+
+            let msg = "";
+            if (currentMode === "pomodoro") msg = "🎉 Time’s up! Take a short break 🌿";
+            else if (currentMode === "short") msg = "💪 Short break over! Ready for another focus session?";
+            else msg = "🌅 Long break finished! Time to get back on track!";
+
+            alert(msg);
         }
 
         function stopAlarm() {
             alarm.pause();
             alarm.currentTime = 0;
             alarmControls.style.display = "none";
-            alert("⏸ Alarm stopped! Relax a bit or start another session 🌿");
+        }
+
+        function updateDisplay() {
+            let minutes = Math.floor(totalTime / 60);
+            let seconds = totalTime % 60;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            timerDisplay.textContent = `${minutes}:${seconds}`;
         }
 
         function toggleFocusMode() {
@@ -183,7 +242,8 @@
                 document.getElementById("focus-warning").style.display = "flex";
             } else {
                 isVisible = true;
-                document.getElementById("focus-warning").style.display = "none";
+                if (document.getElementById("focus-warning"))
+                    document.getElementById("focus-warning").style.display = "none";
             }
         });
 
@@ -194,6 +254,8 @@
                 return e.returnValue;
             }
         });
+
+        updateDisplay();
     </script>
 </body>
 </html>
