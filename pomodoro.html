@@ -1,319 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pomodoro Timer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Timer</title>
 
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat&display=swap');
 
-    body {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(270deg, 
-            #ffb3ba, #ffdfba, #ffffba, #ffb3f3, #ffd6a5);
-        background-size: 1400% 1400%;
-        animation: flowingWater 20s ease infinite;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        color: #fff;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-        overflow-x: hidden;
-    }
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+}
 
-    @keyframes flowingWater {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
-    }
+/* 🎥 Background Video */
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain; /* ensures the whole video is visible */
+    background-color: rgb(7, 5, 19); /* fills the empty space with black bars if needed */
+    z-index: -2;
+}
 
-    h1 {
-        font-family: 'Pacifico', cursive;
-        font-size: 2.5em;
-        margin: 15px;
-        text-align: center;
-        color: #fff8e7;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-    }
+/* ✨ Sparkle Animation */
+.sparkle {
+    position: fixed;
+    top: -10px;
+    font-size: 1.5em;
+    user-select: none;
+    pointer-events: none;
+    z-index: 0;
+    animation: fall linear infinite;
+    opacity: 0.8;
+    color: #ffe6f2;
+    text-shadow: 0 0 6px #ffb6c1, 0 0 10px #fff;
+}
 
-    #timer {
-        font-size: 4em;
-        margin-bottom: 20px;
-        padding: 20px 40px;
-        border-radius: 25px;
-        background: rgba(255,255,255,0.25);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 6px 25px rgba(255, 182, 193, 0.3);
-        text-align: center;
-        width: fit-content;
-        min-width: 220px;
-    }
+@keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0.6; }
+}
 
-    .controls {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 10px;
-        text-align: center;
-    }
+/* 🎀 Main UI Styling */
+h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.5em;
+    margin: 15px;
+    text-align: center;
+    color: #fff8e7;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    z-index: 2;
+}
 
-    button {
-        background-color: #ffd6e0;
-        color: #d63384;
-        border: none;
-        padding: 12px 30px;
-        font-size: 1.2em;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 6px 15px rgba(255, 182, 193, 0.4);
-        font-family: 'Caveat', cursive;
-        flex: 1 1 130px;
-        max-width: 180px;
-    }
+#timer {
+    font-size: 4em;
+    margin-bottom: 20px;
+    padding: 20px 40px;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 25px rgba(255, 182, 193, 0.3);
+    text-align: center;
+    width: fit-content;
+    min-width: 220px;
+    z-index: 2;
+}
 
-    button:hover {
-        background-color: #fff0f5;
-        transform: scale(1.08);
-        box-shadow: 0 8px 22px rgba(255, 192, 203, 0.5);
-    }
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    z-index: 2;
+}
 
-    button:active {
-        transform: scale(0.97);
-        box-shadow: 0 4px 12px rgba(255, 192, 203, 0.4);
-    }
+button {
+    background-color: #ffd6e0;
+    color: #d63384;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.2em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(255, 182, 193, 0.4);
+    font-family: 'Caveat', cursive;
+    flex: 1 1 130px;
+    max-width: 180px;
+}
 
-    #focus-warning {
-        display: none;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85);
-        color: #fff;
-        font-size: 2em;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        z-index: 9999;
-        padding: 20px;
-        backdrop-filter: blur(5px);
-    }
+button:hover {
+    background-color: #fff0f5;
+    transform: scale(1.08);
+    box-shadow: 0 8px 22px rgba(255, 192, 203, 0.5);
+}
 
-    #focus-status {
-        font-size: 1.2em;
-        margin-top: 10px;
-        color: #fff8e7;
-        font-family: 'Caveat', cursive;
-        text-align: center;
-    }
+button:active {
+    transform: scale(0.97);
+    box-shadow: 0 4px 12px rgba(255, 192, 203, 0.4);
+}
 
-    #alarm-controls {
-        display: none;
-        margin-top: 15px;
-        text-align: center;
-        width: 100%;
-    }
+.mode-btn.active {
+    background-color: #ffb3c6;
+    color: #fff;
+}
 
-    #alarm-controls button {
-        max-width: 220px;
-    }
+#focus-status {
+    font-size: 1.2em;
+    margin-top: 10px;
+    color: #fff8e7;
+    font-family: 'Caveat', cursive;
+    text-align: center;
+    z-index: 2;
+}
 
-    .mode-btn.active {
-        background-color: #ffb3c6;
-        color: #fff;
-    }
+#alarm-controls {
+    display: none;
+    margin-top: 15px;
+    text-align: center;
+    width: 100%;
+    z-index: 2;
+}
 
-    /* 📱 Responsive fixes for mobile screens */
-    @media (max-height: 700px) {
-        body {
-            height: auto;
-            padding: 20px;
-        }
-    }
+#alarm-controls button {
+    max-width: 220px;
+}
 
-    @media (max-width: 600px) {
-        h1 {
-            font-size: 2em;
-        }
-
-        #timer {
-            font-size: 3em;
-            padding: 15px 25px;
-        }
-
-        button {
-            font-size: 1em;
-            padding: 10px 20px;
-        }
-
-        #alarm-controls {
-            margin-top: 25px;
-        }
-    }
-
-    @media (max-width: 400px) {
-        #timer {
-            font-size: 2.5em;
-        }
-
-        button {
-            font-size: 0.9em;
-            padding: 8px 16px;
-            max-width: 150px;
-        }
-
-        h1 {
-            font-size: 1.8em;
-        }
-    }
+/* Responsive Fixes */
+@media (max-width: 600px) {
+    h1 { font-size: 2em; }
+    #timer { font-size: 3em; padding: 15px 25px; }
+    button { font-size: 1em; padding: 10px 20px; }
+}
 </style>
-
 </head>
+
 <body>
-    <h1>🌈 Pomodoro Focus Timer 🌈</h1>
-    <div id="timer">25:00</div>
+<!-- 🎥 Background Video -->
+<video autoplay muted loop id="bg-video">
+    <source src="C:/Users/Dell/Downloads/Untitled video - Made with Clipchamp (1).mp4" type="video/mp4">
+</video>
 
-    <div class="controls">
-        <button class="mode-btn active" onclick="setMode('pomodoro')">Pomodoro</button>
-        <button class="mode-btn" onclick="setMode('short')">Short Break</button>
-        <button class="mode-btn" onclick="setMode('long')">Long Break</button>
-    </div>
+<h1>🌈 Pomodoro Focus Timer 🌈</h1>
+<div id="timer">25:00</div>
 
-    <div class="controls">
-        <button onclick="startTimer()">Start Timer</button>
-        <button onclick="toggleFocusMode()">Focus Mode: OFF</button>
-    </div>
+<div class="controls">
+    <button class="mode-btn active" onclick="setMode('pomodoro')">Pomodoro</button>
+    <button class="mode-btn" onclick="setMode('short')">Short Break</button>
+    <button class="mode-btn" onclick="setMode('long')">Long Break</button>
+</div>
 
-    <div id="focus-status"></div>
+<div class="controls">
+    <button onclick="startTimer()">Start Timer</button>
+    <button onclick="toggleFocusMode()">Focus Mode: OFF</button>
+</div>
 
-    <div id="alarm-controls">
-        <button onclick="stopAlarm()">🛑 Stop Alarm</button>
-    </div>
+<div id="focus-status"></div>
+<div id="alarm-controls">
+    <button onclick="stopAlarm()">🛑 Stop Alarm</button>
+</div>
 
-    <!-- gentle alarm sound -->
-    <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
+<audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
 
-    <script>
-        let timer;
-        let totalTime = 25 * 60;
-        let isRunning = false;
-        let isVisible = true;
-        let focusMode = false;
-        let currentMode = "pomodoro"; // modes: pomodoro, short, long
+<script>
+let timer;
+let totalTime = 25 * 60;
+let isRunning = false;
+let isVisible = true;
+let focusMode = false;
+let currentMode = "pomodoro";
 
-        const focusButton = document.querySelectorAll("button")[4];
-        const alarm = document.getElementById("alarmSound");
-        const alarmControls = document.getElementById("alarm-controls");
-        const timerDisplay = document.getElementById("timer");
+const focusButton = document.querySelectorAll("button")[4];
+const alarm = document.getElementById("alarmSound");
+const alarmControls = document.getElementById("alarm-controls");
+const timerDisplay = document.getElementById("timer");
 
-        const modes = {
-            pomodoro: 25 * 60,
-            short: 5 * 60,
-            long: 15 * 60
-        };
+const modes = {
+    pomodoro: 25 * 60,
+    short: 5 * 60,
+    long: 15 * 60
+};
 
-        function setMode(mode) {
-            clearInterval(timer);
-            isRunning = false;
-            currentMode = mode;
-            totalTime = modes[mode];
-            updateDisplay();
-            highlightActiveButton(mode);
-            stopAlarm();
-        }
+function setMode(mode) {
+    clearInterval(timer);
+    isRunning = false;
+    currentMode = mode;
+    totalTime = modes[mode];
+    updateDisplay();
+    highlightActiveButton(mode);
+    stopAlarm();
+}
 
-        function highlightActiveButton(mode) {
-            document.querySelectorAll(".mode-btn").forEach(btn => {
-                btn.classList.remove("active");
-            });
-            document.querySelector(`[onclick="setMode('${mode}')"]`).classList.add("active");
-        }
+function highlightActiveButton(mode) {
+    document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelector(`[onclick="setMode('${mode}')"]`).classList.add("active");
+}
 
-        function startTimer() {
-            if (isRunning) return;
-            isRunning = true;
-            timer = setInterval(countdown, 1000);
-        }
+function startTimer() {
+    if (isRunning) return;
+    isRunning = true;
+    timer = setInterval(countdown, 1000);
+}
 
-        function countdown() {
-            if (!isVisible) return;
+function countdown() {
+    if (!isVisible) return;
+    let minutes = Math.floor(totalTime / 60);
+    let seconds = totalTime % 60;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+    timerDisplay.textContent = `${minutes}:${seconds}`;
+    totalTime--;
+    if (totalTime < 0) {
+        clearInterval(timer);
+        triggerAlarm();
+    }
+}
 
-            let minutes = Math.floor(totalTime / 60);
-            let seconds = totalTime % 60;
+function triggerAlarm() {
+    timerDisplay.textContent = "00:00";
+    alarm.play();
+    alarmControls.style.display = "block";
+    let msg = "";
+    if (currentMode === "pomodoro") msg = "🎉 Time’s up! Take a short break 🌿";
+    else if (currentMode === "short") msg = "💪 Short break over! Ready for another focus session?";
+    else msg = "🌅 Long break finished! Time to get back on track!";
+    alert(msg);
+}
 
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
+function stopAlarm() {
+    alarm.pause();
+    alarm.currentTime = 0;
+    alarmControls.style.display = "none";
+}
 
-            timerDisplay.textContent = `${minutes}:${seconds}`;
-            totalTime--;
+function updateDisplay() {
+    let minutes = Math.floor(totalTime / 60);
+    let seconds = totalTime % 60;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+    timerDisplay.textContent = `${minutes}:${seconds}`;
+}
 
-            if (totalTime < 0) {
-                clearInterval(timer);
-                triggerAlarm();
-            }
-        }
+function toggleFocusMode() {
+    focusMode = !focusMode;
+    focusButton.textContent = `Focus Mode: ${focusMode ? "ON" : "OFF"}`;
+    focusButton.style.backgroundColor = focusMode ? "#ff9eb5" : "#ffd6e0";
+    document.getElementById("focus-status").textContent = focusMode 
+        ? "🧘 Focus mode activated — stay in this tab!"
+        : "💤 Focus mode turned off. You can switch freely now.";
+}
 
-        function triggerAlarm() {
-            timerDisplay.textContent = "00:00";
-            alarm.play();
-            alarmControls.style.display = "block";
+document.addEventListener("visibilitychange", () => {
+    if (focusMode && document.hidden && isRunning) isVisible = false;
+    else isVisible = true;
+});
 
-            let msg = "";
-            if (currentMode === "pomodoro") msg = "🎉 Time’s up! Take a short break 🌿";
-            else if (currentMode === "short") msg = "💪 Short break over! Ready for another focus session?";
-            else msg = "🌅 Long break finished! Time to get back on track!";
+window.addEventListener("beforeunload", (e) => {
+    if (focusMode && isRunning && totalTime > 0) {
+        e.preventDefault();
+        e.returnValue = "You are in focus mode! Are you sure you want to leave?";
+        return e.returnValue;
+    }
+});
 
-            alert(msg);
-        }
+updateDisplay();
 
-        function stopAlarm() {
-            alarm.pause();
-            alarm.currentTime = 0;
-            alarmControls.style.display = "none";
-        }
-
-        function updateDisplay() {
-            let minutes = Math.floor(totalTime / 60);
-            let seconds = totalTime % 60;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            timerDisplay.textContent = `${minutes}:${seconds}`;
-        }
-
-        function toggleFocusMode() {
-            focusMode = !focusMode;
-            focusButton.textContent = `Focus Mode: ${focusMode ? "ON" : "OFF"}`;
-            focusButton.style.backgroundColor = focusMode ? "#ff9eb5" : "#ffd6e0";
-            document.getElementById("focus-status").textContent = focusMode 
-                ? "🧘 Focus mode activated — stay in this tab!"
-                : "💤 Focus mode turned off. You can switch freely now.";
-        }
-
-        document.addEventListener("visibilitychange", () => {
-            if (focusMode && document.hidden && isRunning) {
-                isVisible = false;
-                document.getElementById("focus-warning").style.display = "flex";
-            } else {
-                isVisible = true;
-                if (document.getElementById("focus-warning"))
-                    document.getElementById("focus-warning").style.display = "none";
-            }
-        });
-
-        window.addEventListener("beforeunload", (e) => {
-            if (focusMode && isRunning && totalTime > 0) {
-                e.preventDefault();
-                e.returnValue = "You are in focus mode! Are you sure you want to leave?";
-                return e.returnValue;
-            }
-        });
-
-        updateDisplay();
-    </script>
+/* ✨ Create Sparkles */
+function createSparkle() {
+    const sparkle = document.createElement("div");
+    sparkle.classList.add("sparkle");
+    sparkle.textContent = "🌼";
+    sparkle.style.left = Math.random() * 100 + "vw";
+    sparkle.style.fontSize = Math.random() * 20 + 10 + "px";
+    sparkle.style.animationDuration = Math.random() * 5 + 4 + "s";
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 9000);
+}
+setInterval(createSparkle, 250);
+</script>
 </body>
 </html>
